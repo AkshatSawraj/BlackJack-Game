@@ -26,3 +26,104 @@ function hitFunc() {
     }
 
 }
+function showScore(activePlayer) {
+    if (activePlayer['score'] > 21) {
+        document.getElementById(activePlayer['scoreSpanTag']).textContent = 'BUST!';
+        document.getElementById(activePlayer['scoreSpanTag']).style.color = 'red';
+        obj['losses']++;
+        document.getElementById('losses').textContent = obj['losses'];
+        lossSound.play;
+        document.getElementById('result').textContent ='You Lose';
+        document.getElementById('result').style.color = 'red';
+       
+
+
+    } else {
+        document.getElementById(activePlayer['scoreSpanTag']).textContent = activePlayer['score'];
+    }
+}
+function updateScore(card, activePlayer) {
+    if (card === 'A') {
+        if (activePlayer['score'] + obj['cardValue'][card][1] <= 21) {
+            activePlayer['score'] += obj['cardValue'][card][1];
+
+        } else {
+            activePlayer['score'] += obj['cardValue'][card][0];
+        }
+    } else { activePlayer['score'] += obj['cardValue'][card]; }
+
+}
+function showCard(activePlayer, cardd) {
+    if (activePlayer['score'] <= 21) {
+        let card = document.createElement('img');
+        card.src = './images/' + cardd + '.png';
+        document.getElementById(activePlayer['divTag']).appendChild(card);
+        hitSound.play();
+    }
+}
+function dealFunc() {
+    if (obj['turnsOver'] === true) {
+        obj['isStand'] = false;
+        let yourImages = document.querySelector('#yourBox').querySelectorAll('img');
+        let dealerImages = document.querySelector('#dealerBox').querySelectorAll('img');
+
+        for (let i = 0; i < yourImages.length; i++) {
+            yourImages[i].remove();
+        }
+        for (let i = 0; i < dealerImages.length; i++) {
+            dealerImages[i].remove();
+        }
+        you['score'] = 0;
+        dealer['score'] = 0;
+
+        document.getElementById('yourScore').textContent = 0;
+        document.getElementById('yourScore').style.color = 'whitesmoke';
+        document.getElementById('dealerScore').textContent = 0;
+        document.getElementById('dealerScore').style.color = 'whitesmoke';
+
+        document.getElementById('result').textContent = 'Lets Play!';
+        document.getElementById('result').style.color = 'black';
+        obj['turnsOver'] === false;
+    }
+
+}
+function randomCard() {
+    return obj['cards'][Math.floor(Math.random() * 13)];
+}
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+async function dealerLogic() {
+    obj['isStand'] = true;
+    while (dealer['score'] < 16 && obj['isStand'] === true) {
+        let card = randomCard();
+        showCard(dealer, card);
+        updateScore(card, dealer);
+        showScore(dealer);
+        await sleep(800);
+    }
+    obj['turnsOver'] = true;
+    showResult(computeWinner());
+}
+function computeWinner() {
+    let winner;
+    if (you['score'] <= 21) {
+        if (you['score'] > dealer['score'] || dealer['score'] > 21) {
+            obj['wins']++;
+            winner = you;
+        } else if (you['score'] < dealer['score']) {
+            winner = dealer;
+            obj['losses']++;
+        }
+        else if (you['score'] === dealer['score']) {
+            obj['draws']++;
+        }
+    } else if (you['score'] > 21 && dealer['score'] <= 21) {
+        winner = dealer;
+        obj['losses']++;
+    }
+    else if (you['score'] > 21 && dealer['score'] > 21) {
+        obj['draws']++;
+    }
+    return winner;
+}
