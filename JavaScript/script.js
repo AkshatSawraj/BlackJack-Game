@@ -127,3 +127,28 @@ function computeWinner() {
     }
     return winner;
 }
+function showResult(winner) {
+    let message, messageColor;
+    if (obj['turnsOver'] === true) {
+
+        if (winner === you) {
+            document.getElementById('wins').textContent = obj['wins'];
+            message = 'You Won!';
+            messageColor = 'green';
+            winSound.play;
+        }
+        else if (winner === dealer) {
+            document.getElementById('losses').textContent = obj['losses'];
+            message = 'You Lose';
+            messageColor = 'red';
+            lossSound.play;
+        } else {
+            document.getElementById('draws').textContent = obj['draws'];
+
+            messageColor = 'black';
+            message = 'You Drew!';
+        }
+        document.getElementById('result').textContent = message;
+        document.getElementById('result').style.color = messageColor;
+    }
+}
